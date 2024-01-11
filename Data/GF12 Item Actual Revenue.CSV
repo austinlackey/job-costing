@@ -1,0 +1,42 @@
+,"Type","Date","Num","Name","Memo","Account","Paid","Qty","Amount","Balance","Account Type"
+"Parts",,,,,,,,,,"",
+"Crating (Component Crating)",,,,,,,,,,"",
+,"Invoice","04/19/2022","15780","General Films:GF12 - 2-Up Bag Machine","Component Crating and or Palletizing","47920 · Sales - Parts","Paid",0,0.00,0.00,"Income"
+,"Invoice","09/16/2022","16149","General Films:GF12 - 2-Up Bag Machine","Component Crating and or Palletizing","47920 · Sales - Parts","Paid",0,0.00,0.00,"Income"
+,"Invoice","03/31/2023","16559","General Films:GF12 - 2-Up Bag Machine","Component Crating and or Palletizing","47920 · Sales - Parts","Paid",0,0.00,0.00,"Income"
+,"Invoice","12/29/2023","17073","General Films:GF12 - 2-Up Bag Machine","Component Crating and or Palletizing","47920 · Sales - Parts","Unpaid",1,10191.44,10191.44,"Income"
+"Total Crating (Component Crating)",,,,,,,,,10191.44,10191.44,
+"GF12 ECO.001 (Engineering Change Order referenced in quote ""GF12 ECO.001 Quote 02...",,,,,,,,,,"",
+,"Invoice","12/29/2023","17072","General Films:GF12 - 2-Up Bag Machine","Engineering Change Order referenced in quote ""GF12 ECO.001 Quote 02.21.23""","47900 · Sales - Machinery","Unpaid",1,6065.00,6065.00,"Income"
+"Total GF12 ECO.001 (Engineering Change Order referenced in quote ""GF12 ECO.001 Quote 02...",,,,,,,,,6065.00,6065.00,
+"GF12.00.00.A (2-Up Bag Machine ($796,150))",,,,,,,,,,"",
+,"Invoice","04/19/2022","15780","General Films:GF12 - 2-Up Bag Machine","2-Up Bag Machine ($796,150)","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","09/16/2022","16149","General Films:GF12 - 2-Up Bag Machine","2-Up Bag Machine ($796,150)","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","03/31/2023","16559","General Films:GF12 - 2-Up Bag Machine","2-Up Bag Machine ($796,150)","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","12/29/2023","17073","General Films:GF12 - 2-Up Bag Machine","2-Up Bag Machine ($796,150)","47900 · Sales - Machinery","Paid",1,0.00,0.00,"Income"
+"Total GF12.00.00.A (2-Up Bag Machine ($796,150))",,,,,,,,,0.00,0.00,
+"Total Parts",,,,,,,,,16256.44,16256.44,
+"Service",,,,,,,,,,"",
+"Field-Expenses (Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an e...",,,,,,,,,,"",
+,"Invoice","04/19/2022","15780","General Films:GF12 - 2-Up Bag Machine","Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an estimate, and will be billed out...","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","09/16/2022","16149","General Films:GF12 - 2-Up Bag Machine","Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an estimate, and will be billed out...","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","03/31/2023","16559","General Films:GF12 - 2-Up Bag Machine","Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an estimate, and will be billed out...","47900 · Sales - Machinery","Paid",0,0.00,0.00,"Income"
+,"Invoice","12/29/2023","17073","General Films:GF12 - 2-Up Bag Machine","Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an estimate, and will be billed out...","47900 · Sales - Machinery","Unpaid",1,9586.43,9586.43,"Income"
+"Total Field-Expenses (Field Expenses (Travel, Lodging, Meals) (Expenses quoted are an e...",,,,,,,,,9586.43,9586.43,
+"Freight-Machinery (Billable Freight Charges)",,,,,,,,,,"",
+,"Invoice","04/19/2022","15780","General Films:GF12 - 2-Up Bag Machine","Freight Charges (TBD)","51200 · Freight-Machinery","Paid",0,0.00,0.00,"Cost of Goods Sold"
+,"Invoice","09/16/2022","16149","General Films:GF12 - 2-Up Bag Machine","Freight Charges (TBD)","51200 · Freight-Machinery","Paid",0,0.00,0.00,"Cost of Goods Sold"
+,"Invoice","03/31/2023","16559","General Films:GF12 - 2-Up Bag Machine","Freight Charges (TBD)","51200 · Freight-Machinery","Paid",0,0.00,0.00,"Cost of Goods Sold"
+,"Invoice","12/29/2023","17073","General Films:GF12 - 2-Up Bag Machine","Freight Charges (Customer arranged, no charge)","51200 · Freight-Machinery","Paid",0,0.00,0.00,"Cost of Goods Sold"
+"Total Freight-Machinery (Billable Freight Charges)",,,,,,,,,0.00,0.00,
+"Labor-Field Service (Field Equipment Service, Maintenance and Installation (Time ...",,,,,,,,,,"",
+,"Invoice","04/19/2022","15780","General Films:GF12 - 2-Up Bag Machine","Field Equipment Service, Maintenance and Installation (Time quoted is an estimate, and will be b...","47940 · Shop Labor","Paid",0,0.00,0.00,"Income"
+,"Invoice","09/16/2022","16149","General Films:GF12 - 2-Up Bag Machine","Field Equipment Service, Maintenance and Installation (Time quoted is an estimate, and will be b...","47940 · Shop Labor","Paid",0,0.00,0.00,"Income"
+,"Invoice","03/31/2023","16559","General Films:GF12 - 2-Up Bag Machine","Field Equipment Service, Maintenance and Installation (Time quoted is an estimate, and will be b...","47940 · Shop Labor","Paid",0,0.00,0.00,"Income"
+,"Invoice","12/29/2023","17073","General Films:GF12 - 2-Up Bag Machine","Field Equipment Service, Maintenance and Installation (Time quoted is an estimate, and will be b...","47940 · Shop Labor","Unpaid",147,22050.00,22050.00,"Income"
+"Total Labor-Field Service (Field Equipment Service, Maintenance and Installation (Time ...",,,,,,,,,22050.00,22050.00,
+"Total Service",,,,,,,,,31636.43,31636.43,
+"No item",,,,,,,,,,"",
+,"General Journal","12/29/2023","GF12WIP","General Films:GF12 - 2-Up Bag Machine",,"47900 · Sales - Machinery","Unpaid","",796150.00,796150.00,"Income"
+"Total no item",,,,,,,,,796150.00,796150.00,
+"TOTAL",,,,,,,,,844042.87,844042.87,

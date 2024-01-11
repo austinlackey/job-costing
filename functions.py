@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+import re
 pd.set_option('display.max_colwidth', None)
 
 
@@ -19,15 +21,71 @@ def loadPO(filename: str):
     data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%y')
     return data
 
-def loadBOM_Purchased(filename: str):
-    if filename.endswith('.csv'):
-        data = pd.read_csv(filename)
-    if filename.endswith('.xlsx'):
-        data = pd.read_excel(filename)
-    data = data[['Purchased', 'Description', 'PK QTY', 'Locations']] # Only keep relevant columns
-    data.rename(columns={'Purchased': 'Part Number', 'PK QTY': 'Pack Qty'}, inplace=True)
-    data['Part Number'] = data['Part Number'].str.replace('\t', '') # get rid of \t tab characters in Part Number  
+def loadBOMs(filename: str):
+    # Check if file exists
+    if not os.path.exists(filename):
+        print(f"ERROR: File {filename} does not exist.")
+        return
 
+    # Check if file is of correct type
+    if not filename.endswith('.xlsx'):
+        print('ERROR: Only .xlsx files are supported.')
+        return
+
+    # Read in excel and get all sheets
+    xls = pd.ExcelFile(filename)
+    sheet_names = xls.sheet_names
+    print(sheet_names)
+
+    # Dictionary to hold dataframes
+    df_dict = {}
+
+    # Function mapping for formatting
+    format_functions = {
+        'assemblies': formatBOM_assemblies,
+        'machined': formatBOM_machined,
+        'purchased': formatBOM_purchased,
+        'extrusion': formatBOM_extrusion
+    }
+
+    # Process each sheet
+    for sheet in sheet_names:
+        for key in format_functions.keys():
+            if key in sheet.lower():
+                df = pd.read_excel(filename, sheet_name=sheet)
+                df = format_functions[key](df)
+                df_dict[key] = df
+
+    # Return dictionary of dataframes
+    return df_dict
+
+
+# ==============================
+#           FORMAT DATA
+# ==============================
+def formatBOM_assemblies(data: pd.DataFrame):
+    return data
+def formatBOM_machined(data: pd.DataFrame):
+    try:
+        data = data[['Part #', 'Rev', 'Machined', 'Description', 'Cost', 'Total Qty', 'Vendor', 'Locations']].copy() # Only keep relevant columns
+        data.rename(columns={'Part #': 'Part Number', 'Machined': 'Part Number Rev'}, inplace=True) # Rename columns
+        return data
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+def formatBOM_purchased(data: pd.DataFrame):
+    try:
+        data = data[['Purchased', 'Description', 'PK QTY', 'Locations', 'Vendor']].copy() # Only keep relevant columns
+        data.rename(columns={'Purchased': 'Part Number', 'PK QTY': 'Pack Qty'}, inplace=True) # Rename columns
+        data['Part Number'] = data['Part Number'].str.replace('\t', '') # get rid of \t tab characters in Part Number
+        data = data[~data['Vendor'].str.contains('crave', case=False)].reset_index(drop=True)
+        # get rid of vendor column
+        data = data[['Part Number', 'Description', 'Pack Qty', 'Locations']].copy()
+        return data
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+def formatBOM_extrusion(data: pd.DataFrame):
     return data
 
 def mapPOtoPurchased(po: pd.DataFrame, purchased: pd.DataFrame):
@@ -44,12 +102,15 @@ def mapPOtoPurchased(po: pd.DataFrame, purchased: pd.DataFrame):
 #           HELPERS
 # ==============================
 
-def lookupPartNumber(data: pd.DataFrame, part_num: str):
-    lookup = data[data['Part Number'] == part_num]
+def lookupPartNumber(data: pd.DataFrame, part_num: str, verbatim=True):
+    lookup = None
+    if verbatim:
+        lookup = data[data['Part Number'] == part_num]
+    else:
+        lookup = data[data['Part Number'].str.contains(part_num, case=False)]
     if lookup.empty:
         print('Part Number not found')
-    else:
-        return lookup
+    return lookup
 
 def get_unique_part_nums():
     po_part_nums = po['Part Number'].unique()
@@ -58,24 +119,33 @@ def get_unique_part_nums():
     return part_nums
 
 def code_locations(location):
-    if location is np.nan:
+    if pd.isna(location):
         return np.nan
-    elif location.startswith('001'):
-        return 'Main Controls'
-    elif location.startswith('1'):
-        return 'Main Frame'
-    elif location.startswith('2') or location.startswith('002'):
-        return 'Unwind/Punch Station'
-    elif location.startswith('3') or location.startswith('003') or location.startswith('007'):
-        return 'Spout Station'
-    elif location.startswith('4') or location.startswith('004'):
-        return 'Side Seal Station'
-    elif location.startswith('5') or location.startswith('005'):
-        return 'Cross Seal Station'
-    elif location.startswith('6') or location.startswith('006') or location.startswith('008'):
-        return 'Cap Station'
-    elif location.startswith('8') or location.startswith('7') or location.startswith('009'):
-        return 'Delivery/Cutoff Station'
+
+    location_mapping = {
+        '001': 'Main Controls',
+        '1': 'Main Frame',
+        '2': 'Unwind/Punch Station',
+        '002': 'Unwind/Punch Station',
+        '3': 'Spout Station',
+        '003': 'Spout Station',
+        '007': 'Spout Station',
+        '4': 'Side Seal Station',
+        '004': 'Side Seal Station',
+        '5': 'Cross Seal Station',
+        '005': 'Cross Seal Station',
+        '6': 'Cap Station',
+        '006': 'Cap Station',
+        '008': 'Cap Station',
+        '8': 'Delivery/Cutoff Station',
+        '7': 'Delivery/Cutoff Station',
+        '009': 'Delivery/Cutoff Station'
+    }
+
+    for code, name in location_mapping.items():
+        if location.startswith(code):
+            return name
+
     return np.nan
 
 def parse_locations(locations):
@@ -94,6 +164,60 @@ def parse_locations(locations):
 # ==============================
 #           PROCESS
 # ==============================
+
+def find_machined_parts(parts: np.ndarray):
+    # Match GF12.XXX.XX with an optional .A-Z at the end
+    pattern = r'^GF12\.\d{3}\.\d{2}(\.[A-Z])?$'
+    return [part for part in parts if re.search(pattern, part)]
+
+def chop_revision(parts: np.ndarray):
+    # Match GF12.XXX.XX.[A-Z] and remove the .[A-Z] at the end
+    pattern = r'^GF12\.\d{3}\.\d{2}\.[A-Z]$'
+    return [part[:-2] if re.search(pattern, part) else part for part in parts]
+
+def process_parts(po: pd.DataFrame, bom_assemblies: pd.DataFrame = None, bom_machined: pd.DataFrame = None, bom_purchased: pd.DataFrame = None, bom_extrusion: pd.DataFrame = None, verbose=False):
+    # PO Part Numbers
+    po_part_nums = np.array(po['Part Number'].dropna(), dtype=str)
+
+    # Unique Merged Machine Part Numbers
+    po_machined_part_nums = find_machined_parts(po_part_nums)
+    po_machined_part_nums = chop_revision(po_machined_part_nums)
+    unique_machine_part_nums = np.unique(np.concatenate((po_machined_part_nums, bom_machined['Part Number'].dropna().astype(str)), axis=0))
+    # print(unique_machine_part_nums)
+    output_machined = []
+    process_machined_part('GF12.141.01', bom_machined, po, verbose=True)
+    # for part_num in unique_machine_part_nums:
+    #     output_machined.append(process_machined_part(part_num, bom_machined, po, verbose=False))
+    # # Remove empty or all-NA entries
+    # output_machined = [df for df in output_machined if df.dropna().shape[0] > 0]
+    # output_machined = pd.concat(output_machined, ignore_index=True)
+    # print(output_machined)
+
+
+
+
+    # # Unique Merged Purchased Part Numbers
+    # unique_purchased_part_nums = np.unique(np.concatenate((po_part_nums, bom_purchased['Part Number'].dropna().astype(str)), axis=0))
+    # unique_purchased_part_nums = np.setdiff1d(unique_purchased_part_nums, unique_machine_part_nums)
+    # output_purchased = []
+    # for part_num in unique_purchased_part_nums:
+    #     output_purchased.append(process_purchased_part(part_num, bom_purchased, po, verbose=False))
+    # # Remove empty or all-NA entries
+    # output_purchased = [df for df in output_purchased if df.dropna().shape[0] > 0]
+    # output_purchased = pd.concat(output_purchased, ignore_index=True)
+    # # Deal with Freight and Expedited Attributes
+    # output_purchased.loc[(output_purchased['Part Number'].fillna('').str.contains('freight|expedit', case=False)) & (output_purchased['Location'].isna()), 'Location'] = 'Freight'
+    # # find any rows where Part Number matches unique_machine_part_nums
+
+def process_machined_part(part_num: str, bom_machined: pd.DataFrame, po: pd.DataFrame, verbose=False):
+    # Filter Data
+    purchased_frame = po[po['Part Number'] == part_num].copy() # Get all rows with Part Number
+    purchased_frame.sort_values(by=['Date', 'Num'], inplace=True) # Sort by Date, then PO Number
+    lookup_frame = bom_machined[bom_machined['Part Number'] == part_num].copy() # Get all rows with Part Number
+
+    display(purchased_frame)
+    display(lookup_frame)
+
 def process_purchased_part(part_num: str, bom_purchased: pd.DataFrame, po: pd.DataFrame, verbose=False):
     # Filter Data
     purchased_frame = po[po['Part Number'] == part_num].copy() # Get all rows with Part Number
