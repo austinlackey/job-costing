@@ -185,7 +185,7 @@ def process_parts(po: pd.DataFrame, bom_assemblies: pd.DataFrame = None, bom_mac
     unique_machine_part_nums = np.unique(np.concatenate((po_machined_part_nums, bom_machined['Part Number'].dropna().astype(str)), axis=0))
     # print(unique_machine_part_nums)
     output_machined = []
-    process_machined_part('GF12.141.01', bom_machined, po, verbose=True)
+    process_machined_part('GF12.414.02', bom_machined, po, verbose=True)
     # for part_num in unique_machine_part_nums:
     #     output_machined.append(process_machined_part(part_num, bom_machined, po, verbose=False))
     # # Remove empty or all-NA entries
@@ -211,11 +211,13 @@ def process_parts(po: pd.DataFrame, bom_assemblies: pd.DataFrame = None, bom_mac
 
 def process_machined_part(part_num: str, bom_machined: pd.DataFrame, po: pd.DataFrame, verbose=False):
     # Filter Data
-    purchased_frame = po[po['Part Number'] == part_num].copy() # Get all rows with Part Number
-    purchased_frame.sort_values(by=['Date', 'Num'], inplace=True) # Sort by Date, then PO Number
+    purchased_frame = po[po['Part Number'].str.startswith(part_num)]
+    purchased_frame = purchased_frame.sort_values(by=['Date', 'Num']) # Sort by Date, then PO Number
     lookup_frame = bom_machined[bom_machined['Part Number'] == part_num].copy() # Get all rows with Part Number
 
+    print("PO")
     display(purchased_frame)
+    print("BOM")
     display(lookup_frame)
 
 def process_purchased_part(part_num: str, bom_purchased: pd.DataFrame, po: pd.DataFrame, verbose=False):
