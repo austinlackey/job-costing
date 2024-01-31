@@ -249,5 +249,5 @@ def process_parts(po: pd.DataFrame, machined: pd.DataFrame, purchased: pd.DataFr
     other_frames['Category 2'] = np.nan
     other_frames = apply_overrides(other_frames, po)
     # display(other_frames)
-    display(lookupPartNumber(other_frames, '1AM030AFXK'))
+    return other_frames
 print("Refreshed.")
