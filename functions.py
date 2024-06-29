@@ -234,6 +234,19 @@ def apply_overrides(frame: pd.DataFrame, po: pd.DataFrame):
     frame['Category 2'] = [override if override is not np.nan else category for override, category in zip(frame['Override 2'], frame['Category 2'])]
     frame.drop(['Override 1', 'Override 2'], axis=1, inplace=True)
     return frame
+def process_machine_part(part_num: str, po: pd.DataFrame, machined: pd.DataFrame, verbose=True):
+    print(part_num)
+    # Filter Data
+    # rename po['Part Number'] to po['Part Number Machined']
+    po = po.rename(columns={'Part Number': 'Part Number Machined'})
+    po['Part Number'] = [re.sub(r'\.[A-Z]$', '', part) for part in po['Part Number Machined']]
+    purchased_frame = po[po['Part Number'] == part_num].copy() # Get all rows with Part Number
+    lookup_frame = machined[machined['Part Number'] == part_num].copy() # Get all rows with Part Number
+    print("PO")
+    display(purchased_frame)
+    print("Machined")
+    display(lookup_frame)
+
 def process_parts(po: pd.DataFrame, machined: pd.DataFrame, purchased: pd.DataFrame, verbose=False):
     part_nums = get_unique_parts(po, machined, purchased)
     machined_parts = find_machined_parts(part_nums)
@@ -241,13 +254,24 @@ def process_parts(po: pd.DataFrame, machined: pd.DataFrame, purchased: pd.DataFr
     if verbose:
         print(f'Found {len(machined_parts)} machined parts and {len(other_parts)} other parts, with {len(part_nums)} total unique parts.')
         print()
-    other_frames = []
-    for part in other_parts:
-        other_frames.append(process_purchased_part(part, po, purchased, verbose=False))
-    other_frames = pd.concat(other_frames)
-    other_frames['Category 1'] = other_frames['Location'].apply(code_locations)
-    other_frames['Category 2'] = np.nan
-    other_frames = apply_overrides(other_frames, po)
-    # display(other_frames)
-    return other_frames
+    machined_frames = []
+    # grab the 10th part in the list
+    # for each part in machined_parts, if it ends in .<Letter>, replace with ''
+    machined_parts = [re.sub(r'\.[A-Z]$', '', part) for part in machined_parts]
+    machined_parts = np.unique(machined_parts)
+    part = 15
+    machined_parts = machined_parts[part:part+1]
+    print(machined_parts)
+    for part in machined_parts:
+        machined_frames.append(process_machine_part(part, po, machined, verbose=False))
+    
+    # other_frames = []
+    # for part in other_parts:
+    #     other_frames.append(process_purchased_part(part, po, purchased, verbose=False))
+    # other_frames = pd.concat(other_frames)
+    # other_frames['Category 1'] = other_frames['Location'].apply(code_locations)
+    # other_frames['Category 2'] = np.nan
+    # other_frames = apply_overrides(other_frames, po)
+    # # display(other_frames)
+    # return other_frames
 print("Refreshed.")
